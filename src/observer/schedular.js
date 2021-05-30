@@ -1,4 +1,4 @@
-// import { nextTick } from "../util";
+import { nextTick } from "../util";
 
 let has = {};
 let queue = [];
@@ -22,7 +22,7 @@ export function queueWatcher(watcher) { // 调度更新几次
         // 让queue 清空ss
         if(!pending){
             pending = true;
-            // nextTick(flushSchedularQueue);
+            nextTick(flushSchedularQueue);
         }
     }
 }

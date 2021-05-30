@@ -11,6 +11,7 @@
       <ul>
           <li>{{name}}aaa</li>
           <li>{{age}}</li>
+          <li>{{ arr[2] }}</li>
       </ul>
    </div>
     <script src="/dist/vue.js"></script>
@@ -36,11 +37,11 @@
     // vue2 options Api  tree-shaking
     el: "#app",
     data() {
-      return { name: "zf", age: 10 }; // vue中数组中的对象 如果变化了 也需要更新视图
+      return { name: "zf", age: 10, arr: [1,2,3, {pa: '23'}] }; // vue中数组中的对象 如果变化了 也需要更新视图
     },
   });
   setTimeout(() => {
-    vm.name = 'ga' 
+    vm.arr[2] = 'ga'  
   }, 2000)
   console.log(vm)
 </script>

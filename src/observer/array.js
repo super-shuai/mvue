@@ -29,6 +29,7 @@ methods.forEach(method=>{   // AOP切片编程
               break;
       }
       if(inserted)  ob.observeArray(inserted);
+      ob.dep.notify();
       return result;
   }
 })

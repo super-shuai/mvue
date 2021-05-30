@@ -26,6 +26,9 @@ class Watcher {
         dep.addSub(this)
       }
     }
+    run() {
+      this.get()
+    }
     update() { // 如果多次更改 我希望合并成一次  （防抖）
       // this.get(); // 不停的重新渲染
       queueWatcher(this)

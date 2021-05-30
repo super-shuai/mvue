@@ -3,6 +3,7 @@ import { arrayMethods } from "./array"
 
 class Observer {
   constructor(value) {
+    this.dep = new Dep()
     // value.__ob__ = this; 
     Object.defineProperty(value,'__ob__',{
       value:this,
@@ -29,13 +30,29 @@ class Observer {
     }
   }
 }
-
+function dependArray(value){ // 就是让里层数组收集外层数组的依赖，这样修改里层数组也可以更新视图 
+  for(let i = 0 ; i < value.length;i++){
+      let current = value[i];
+      current.__ob__ && current.__ob__.dep.depend(); // 让里层的和外层收集的都是同一个watcher
+      if(Array.isArray(current)){
+          dependArray(current);
+      }
+  }
+}
 export function defineReactive(data, key, value) {
+  // 递归
+  let childOb = observe(value)
   let dep = new Dep()
   Object.defineProperty(data, key, {
     get() { //需要给每个属性都增加一个dep 
       if (Dep.target) {
         dep.depend();
+        if (childOb) {
+          childOb.dep.depend()
+          if(Array.isArray(value)){
+            dependArray(value);
+          }
+        }
       }
       return value;
     },
@@ -46,8 +63,6 @@ export function defineReactive(data, key, value) {
       dep.notify();// 通知dep中记录的watcher让它去执行
     }
   })
-  // 递归
-  observe(value)
 }
 export function observe(data) {
   // 只对对象类型进行观测 非对象类型无法观测
