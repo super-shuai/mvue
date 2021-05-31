@@ -8,11 +8,17 @@ export function lifecycleMixin(Vue) {
         // 初始化渲染的时候 会创建一个新节点并且将老节点删掉
        
         // 1.第一次渲染完毕后 拿到新的节点，下次再次渲染时替换上次渲染的结果
-        vm.$options.el = patch(vm.$options.el, vnode);
+        vm.$el = patch(vm.$el, vnode);
 
     }
 }
 
+export function callHook(vm,hook){ // 发布模式
+    const handlers = vm.$options[hook];
+    if(handlers){
+        handlers.forEach(handler=>handler.call(vm));
+    }
+}
 
 export function mountComponent(vm, el) {
 

@@ -33,12 +33,26 @@
         虚拟dom只是用来表示dom的
      -->
 <script>
+   Vue.mixin({
+    beforeCreate() {
+      console.log('m-b')
+    },
+    created() {
+      console.log('m-c')
+    }
+  })
   const vm = new Vue({
     // vue2 options Api  tree-shaking
     el: "#app",
     data() {
       return { name: "zf", age: 10, arr: [1,2,3, {pa: '23'}] }; // vue中数组中的对象 如果变化了 也需要更新视图
     },
+    beforeCreate() {
+      console.log('b')
+    },
+    created() {
+      console.log('c')
+    }
   });
   setTimeout(() => {
     vm.arr[2] = 'ga'  
