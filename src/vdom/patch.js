@@ -1,5 +1,8 @@
 export function patch(oldVnode, vnode) {
     // oldVnode 是一个真实的元素
+    if (!oldVnode) {
+        return createElm(vnode)
+    }
     const isRealElement = oldVnode.nodeType
     if (isRealElement) {
         // 初次渲染
@@ -14,9 +17,25 @@ export function patch(oldVnode, vnode) {
     }
 }
 
+function createComponent(vnode){
+    let i = vnode.data;
+    if((i = i.hook) && (i = i.init)){
+        i(vnode); // 调用组件的初始化方法 init() vdom 中的index.js createComponent的 data.hook // vnode.componentInstance.$el
+    }
+    if(vnode.componentInstance){ // 如果虚拟节点上有组件的实例说明当前这个vode是组件
+        return true;
+    }
+    return false;
+}
+
 function createElm(vnode) {
     let { tag, children, key, data, text, vm } = vnode;
     if (typeof tag === 'string') {
+        if(createComponent(vnode)){
+            // 如果返回true 说明这个虚拟节点是组件
+            // 如果是组件，就将组件渲染后的真实元素给我
+            return vnode.componentInstance.$el
+        }
         vnode.el = document.createElement(tag)
         updateProperties(vnode);
         children.forEach(child => {

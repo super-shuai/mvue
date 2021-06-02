@@ -7,15 +7,16 @@
     <title>vue</title>
   </head>
   <body>
-    <div id="app" a=1 b=2 style="color:red">
+    <div id="app" a="1" b="2" style="color: red">
       <ul>
-          <li>{{name}}aaa</li>
-          <li>{{age}}</li>
-          <li>{{ arr[2] }}</li>
+        <li>{{name}}aaa</li>
+        <li>{{age}}</li>
+        <li>{{ arr[2] }}</li>
       </ul>
-   </div>
+      <my-button></my-button>
+    </div>
     <script src="/dist/vue.js"></script>
-<!-- 
+    <!-- 
 
         模板编译原理 AST语法树 （树的遍历）  先标识出html来 -》 js语法
 
@@ -32,32 +33,40 @@
         }
         虚拟dom只是用来表示dom的
      -->
-<script>
-   Vue.mixin({
-    beforeCreate() {
-      console.log('m-b')
-    },
-    created() {
-      console.log('m-c')
-    }
-  })
-  const vm = new Vue({
-    // vue2 options Api  tree-shaking
-    el: "#app",
-    data() {
-      return { name: "zf", age: 10, arr: [1,2,3, {pa: '23'}] }; // vue中数组中的对象 如果变化了 也需要更新视图
-    },
-    beforeCreate() {
-      console.log('b')
-    },
-    created() {
-      console.log('c')
-    }
-  });
-  setTimeout(() => {
-    vm.arr[2] = 'ga'  
-  }, 2000)
-  console.log(vm)
-</script>
+    <script>
+      Vue.mixin({
+        beforeCreate() {
+          console.log("m-b");
+        },
+        created() {
+          console.log("m-c");
+        },
+      });
+      Vue.component("my-button", {
+        template: "<button>按钮</button>",
+      });
+      const vm = new Vue({
+        // vue2 options Api  tree-shaking
+        el: "#app",
+        data() {
+          return { name: "zf", age: 10, arr: [1, 2, 3, { pa: "23" }] }; // vue中数组中的对象 如果变化了 也需要更新视图
+        },
+        components: {
+          "my-button": {
+            template: "<button>内部按钮</button>",
+          },
+        },
+        beforeCreate() {
+          console.log("b");
+        },
+        created() {
+          console.log("c");
+        },
+      });
+      setTimeout(() => {
+        vm.arr[2] = "ga";
+      }, 2000);
+      console.log(vm);
+    </script>
   </body>
 </html>

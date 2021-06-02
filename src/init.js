@@ -18,11 +18,12 @@ export function initMixin(Vue) {
       }
   }
   Vue.prototype.$nextTick = nextTick
+
   Vue.prototype.$mount = function (el) {
-    el = document.querySelector(el);
+    el = el && document.querySelector(el);
     const vm = this;
     const options = vm.$options;
-   vm.$el = el;
+    vm.$el = el;
     // 如果有render 就直接使用render
     // 没有render 看有没有template属性
     // 没有template 就接着找外部模板
@@ -37,7 +38,7 @@ export function initMixin(Vue) {
       options.render = render;
     }
 
-    mountComponent(vm, el);// 组件挂载
+    mountComponent(vm);// 组件挂载
 
   }
 }
