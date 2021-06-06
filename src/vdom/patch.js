@@ -63,20 +63,58 @@ function updateChildren(parent, oldChildren, newChildren) {
     let newStartVnode = newChildren[0]; // 新的开始节点
     let newEndVnode = newChildren[newEndIndex]; // 新的结束节点
 
+    function makeIndexByKey(oldChildren){
+        let map = {};
+        oldChildren.forEach((item,index)=>{
+            map[item.key] = index; // {A:0,B:1,C:2,}
+        });
+        return map
+    }
+
+    let map = makeIndexByKey(oldChildren);
+
     while (oldStartIndex <= oldEndIndex && newStartIndex <= newEndIndex) {
         // 1.前端中比较常见的操作有 像尾部插入 头部插入 头移动到尾部 尾部移动头部，正序和反序
         // 1) 向后插入的操作
-        if (isSameVnode(oldStartVnode, newStartVnode)) {
+        if(!oldStartVnode){
+            oldStartVnode = oldChildren[++oldStartIndex]
+        }else if(!oldEndVnode){
+            oldEndVnode = oldChildren[--oldEndIndex];
+        }else if (isSameVnode(oldStartVnode, newStartVnode)) {
             patch(oldStartVnode, newStartVnode); // 递归比对节点
             oldStartVnode = oldChildren[++oldStartIndex];
             newStartVnode = newChildren[++newStartIndex];
-        } else if (isSameVnode(oldEndVnode, newEndVnode)) {
-            // 2.向前插入
-            patch(oldStartVnode, newStartVnode); // 递归比对节点
+        }else if(isSameVnode(oldEndVnode,newEndVnode)){ // // 2.向前插入
+            patch(oldEndVnode,newEndVnode);
             oldEndVnode = oldChildren[--oldEndIndex];
             newEndVnode = newChildren[--newEndIndex];
         }
-        
+        else if(isSameVnode(oldStartVnode,newEndVnode)){ // 头移动到尾部
+            patch(oldStartVnode,newEndVnode);
+            // dom 操作时具备移动性的 会移动系欸但
+            parent.insertBefore(oldStartVnode.el,oldEndVnode.el.nextSibling);
+            oldStartVnode = oldChildren[++oldStartIndex];
+            newEndVnode = newChildren[--newEndIndex];
+        }else if(isSameVnode(oldEndVnode,newStartVnode)){
+            patch(oldEndVnode,newStartVnode);
+            parent.insertBefore(oldEndVnode.el,oldStartVnode.el);
+            oldEndVnode = oldChildren[--oldEndIndex];
+            newStartVnode = newChildren[++newStartIndex]
+        }else{
+            // 1.需要先查找当前 老节点索引和key的关系
+            // 移动的时候通过新的key 去找对应的老节点索引 =》 获取老节点，可以移动老节点
+            let moveIndex = map[newStartVnode.key];
+            if(moveIndex == undefined){
+                parent.insertBefore(createElm(newStartVnode),oldStartVnode.el);
+            }else{
+                let moveVnode = oldChildren[moveIndex];
+                oldChildren[moveIndex] = undefined;
+                patch(moveVnode,newStartVnode); // 如果找到了 需要两个虚拟节点比对
+                parent.insertBefore(moveVnode.el,oldStartVnode.el)
+            }
+            newStartVnode = newChildren[++newStartIndex];
+        }
+        // 为什么v-for要增加key属性,key为什么不能用index
     }
     if (newStartIndex <= newEndIndex) {  // 新的比老的多 ，插入新节点
         for (let i = newStartIndex; i <= newEndIndex; i++) {
